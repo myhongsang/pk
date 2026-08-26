@@ -1,30 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { User } from '@prisma/client';
 
-import { User } from './entities/user.entity';
+import { PrismaService } from '../prisma/prisma.service';
 import { PasswordUtils } from './utils/password.util';
-import {
-  JWT_PRIVATE_KEY,
-  JWT_EXPIRES_IN,
-} from './constants/jwt.constants';
+import { JWT_PRIVATE_KEY, JWT_EXPIRES_IN } from './constants/jwt.constants';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly prisma: PrismaService,
   ) {}
 
   async validateUser(
     email: string,
     password: string,
   ): Promise<User | null> {
-    // Tìm user trong PostgreSQL
-    const user = await this.userRepository.findOne({
+    const user = await this.prisma.user.findUnique({
       where: { email },
     });
 
@@ -32,7 +25,6 @@ export class AuthService {
       return null;
     }
 
-    // Kiểm tra password bằng bcrypt
     const isPasswordValid = await PasswordUtils.compare(
       password,
       user.password,
