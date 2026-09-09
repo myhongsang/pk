@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { ProductRepository } from './product.repository';
 import { ProductService } from './product.service';
-import { PrismaService } from '../prisma/prisma.service';
 
 describe('ProductService', () => {
   let service: ProductService;
@@ -9,7 +10,7 @@ describe('ProductService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductService,
-        { provide: PrismaService, useValue: {} },
+        { provide: ProductRepository, useValue: {} },
       ],
     }).compile();
 

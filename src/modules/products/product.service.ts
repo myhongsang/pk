@@ -1,28 +1,24 @@
-import { BadRequestException, Injectable, NotFoundException, } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Product } from '@prisma/client';
 
-import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductRepository } from './product.repository';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly productRepository: ProductRepository) {}
 
   create(data: CreateProductDto): Promise<Product> {
-    return this.prisma.product.create({ data });
+    return this.productRepository.create(data);
   }
 
   findAll(): Promise<Product[]> {
-    return this.prisma.product.findMany({
-      orderBy: { id: 'asc' },
-    });
+    return this.productRepository.findAll();
   }
 
   async findOne(id: string): Promise<Product> {
-    const product = await this.prisma.product.findUnique({
-      where: { id },
-    });
+    const product = await this.productRepository.findById(id);
 
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
@@ -38,14 +34,11 @@ export class ProductService {
       throw new BadRequestException('No fields to update');
     }
 
-    return this.prisma.product.update({
-      where: { id },
-      data,
-    });
+    return this.productRepository.update(id, data);
   }
 
   async remove(id: string): Promise<void> {
     await this.findOne(id);
-    await this.prisma.product.delete({ where: { id } });
+    await this.productRepository.delete(id);
   }
 }
