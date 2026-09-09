@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 
 import { PrismaService } from '../../prisma/prisma.service';
+import { SORT_ORDER_DESC } from '../../constants/sort.constants';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -23,7 +24,7 @@ export class UserRepository {
 
   findAll(): Promise<User[]> {
     return this.prisma.user.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: SORT_ORDER_DESC },
     });
   }
 

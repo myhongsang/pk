@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post,} from '@nestjs/common';
 
+import { ROUTE_USERS } from '../../constants/route.constants';
 import { ZodValidationPipe } from '../../utils/zod-validation.pipe';
 import { createUserSchema } from './dto/create-user.dto';
 import type { CreateUserDto } from './dto/create-user.dto';
@@ -7,7 +8,7 @@ import { updateUserSchema } from './dto/update-user.dto';
 import type { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
-@Controller('users')
+@Controller(ROUTE_USERS)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
