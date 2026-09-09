@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
-import { JWT_EXPIRES_IN, JWT_PRIVATE_KEY, JWT_PUBLIC_KEY } from '../../constants/jwt.constants';
+import { JWT_ALGORITHM, JWT_EXPIRES_IN, JWT_PRIVATE_KEY, JWT_PUBLIC_KEY } from '../../constants/jwt.constants';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -16,11 +16,11 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       privateKey: JWT_PRIVATE_KEY,
       publicKey: JWT_PUBLIC_KEY,
       signOptions: {
-        algorithm: 'RS256',
+        algorithm: JWT_ALGORITHM,
         expiresIn: JWT_EXPIRES_IN,
       },
       verifyOptions: {
-        algorithms: ['RS256'],
+        algorithms: [JWT_ALGORITHM],
       },
     }),
   ],

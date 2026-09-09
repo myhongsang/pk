@@ -1,10 +1,11 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, } from '@nestjs/common';
 
+import { ROUTE_PRODUCTS } from '../../constants/route.constants';
 import type { CreateProductDto } from './dto/create-product.dto';
 import type { UpdateProductDto } from './dto/update-product.dto';
 import { ProductService } from './product.service';
 
-@Controller('products')
+@Controller(ROUTE_PRODUCTS)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
