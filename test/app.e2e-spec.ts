@@ -23,6 +23,19 @@ describe('AppController (e2e)', () => {
       .expect('Hello World!');
   });
 
+  it('/products (GET) without token returns 403', () => {
+    return request(app.getHttpServer())
+      .get('/products')
+      .expect(403);
+  });
+
+  it('/products (GET) with invalid token returns 403', () => {
+    return request(app.getHttpServer())
+      .get('/products')
+      .set('Authorization', 'Bearer invalid.token.value')
+      .expect(403);
+  });
+
   afterEach(async () => {
     await app.close();
   });

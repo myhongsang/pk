@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JWT_PUBLIC_KEY } from '../../../constants/jwt.constants';
+import { JWT_ALGORITHM, JWT_IGNORE_EXPIRATION, JWT_PUBLIC_KEY } from '../../../constants/jwt.constants';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
+      ignoreExpiration: JWT_IGNORE_EXPIRATION,
       secretOrKey: JWT_PUBLIC_KEY,
-      algorithms: ['RS256'],
+      algorithms: [JWT_ALGORITHM],
     });
   }
 
