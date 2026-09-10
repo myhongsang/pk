@@ -19,6 +19,10 @@ export const createProductSchema = z.object({
     .int('Stock must be an integer')
     .min(0, 'Stock must be greater than or equal to 0')
     .optional(),
+
+  categoryId: z
+    .uuid('categoryId must be a valid UUID')
+    .optional(),
 });
 
 export type CreateProductDto = z.infer<typeof createProductSchema>;
