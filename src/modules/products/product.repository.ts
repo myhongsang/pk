@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from '@prisma/client';
 
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { SORT_ORDER_ASC } from '@app/constants/sort.constants';
+import { PrismaService } from '@app/prisma/prisma.service';
+import { CreateProductDto } from '@app/modules/products/dto/create-product.dto';
+import { UpdateProductDto } from '@app/modules/products/dto/update-product.dto';
 
 @Injectable()
 export class ProductRepository {
@@ -15,7 +16,7 @@ export class ProductRepository {
 
   findAll(): Promise<Product[]> {
     return this.prisma.product.findMany({
-      orderBy: { id: 'asc' },
+      orderBy: { id: SORT_ORDER_ASC },
     });
   }
 

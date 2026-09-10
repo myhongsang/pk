@@ -1,8 +1,8 @@
-import { ConflictException, NotFoundException,} from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { UserRepository } from './user.repository';
-import { UsersService } from './users.service';
+import { UserRepository } from '@app/modules/users/user.repository';
+import { UsersService } from '@app/modules/users/users.service';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -118,9 +118,9 @@ describe('UsersService', () => {
     it('should throw NotFoundException when the user does not exist', async () => {
       (repository.findById as jest.Mock).mockResolvedValue(null);
 
-      await expect(
-        service.update('uuid-1', { name: 'Bob' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update('uuid-1', { name: 'Bob' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should hash the new password before updating', async () => {
@@ -152,9 +152,7 @@ describe('UsersService', () => {
     it('should throw NotFoundException when the user does not exist', async () => {
       (repository.findById as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.remove('uuid-1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.remove('uuid-1')).rejects.toThrow(NotFoundException);
     });
 
     it('should delete the user when it exists', async () => {
