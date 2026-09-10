@@ -1,13 +1,13 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, UseGuards, } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, UseGuards,} from '@nestjs/common';
 
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ROUTE_CATEGORIES } from '../../constants/route.constants';
-import { ZodValidationPipe } from '../../utils/zod-validation.pipe';
-import { createCategorySchema } from './dto/create-category.dto';
-import type { CreateCategoryDto } from './dto/create-category.dto';
-import { updateCategorySchema } from './dto/update-category.dto';
-import type { UpdateCategoryDto } from './dto/update-category.dto';
-import { CategoriesService } from './categories.service';
+import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth.guard';
+import { ROUTE_CATEGORIES } from '@app/constants/route.constants';
+import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
+import { createCategorySchema } from '@app/modules/categories/dto/create-category.dto';
+import type { CreateCategoryDto } from '@app/modules/categories/dto/create-category.dto';
+import { updateCategorySchema } from '@app/modules/categories/dto/update-category.dto';
+import type { UpdateCategoryDto } from '@app/modules/categories/dto/update-category.dto';
+import { CategoriesService } from '@app/modules/categories/categories.service';
 
 @Controller(ROUTE_CATEGORIES)
 @UseGuards(JwtAuthGuard)
@@ -15,7 +15,9 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
-  create(@Body(new ZodValidationPipe(createCategorySchema)) dto: CreateCategoryDto) {
+  create(
+    @Body(new ZodValidationPipe(createCategorySchema)) dto: CreateCategoryDto,
+  ) {
     return this.categoriesService.create(dto);
   }
 

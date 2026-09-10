@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Category } from '@prisma/client';
 
-import { SORT_ORDER_ASC } from '../../constants/sort.constants';
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { SORT_ORDER_ASC } from '@app/constants/sort.constants';
+import { PrismaService } from '@app/prisma/prisma.service';
+import { CreateCategoryDto } from '@app/modules/categories/dto/create-category.dto';
+import { UpdateCategoryDto } from '@app/modules/categories/dto/update-category.dto';
 
 @Injectable()
 export class CategoriesRepository {

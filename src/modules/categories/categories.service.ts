@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
 import { Category } from '@prisma/client';
 
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CategoriesRepository } from './categories.repository';
+import { CreateCategoryDto } from '@app/modules/categories/dto/create-category.dto';
+import { UpdateCategoryDto } from '@app/modules/categories/dto/update-category.dto';
+import { CategoriesRepository } from '@app/modules/categories/categories.repository';
 
 @Injectable()
 export class CategoriesService {

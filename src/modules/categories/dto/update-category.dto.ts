@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { createCategorySchema } from './create-category.dto';
+import { createCategorySchema } from '@app/modules/categories/dto/create-category.dto';
 
 export const updateCategorySchema = createCategorySchema.partial();
 

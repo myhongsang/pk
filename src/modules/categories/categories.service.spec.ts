@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CategoriesRepository } from './categories.repository';
-import { CategoriesService } from './categories.service';
+import { CategoriesRepository } from '@app/modules/categories/categories.repository';
+import { CategoriesService } from '@app/modules/categories/categories.service';
 
 describe('CategoriesService', () => {
   let service: CategoriesService;

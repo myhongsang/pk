@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 
-import { PrismaService } from '../../prisma/prisma.service';
-import { SORT_ORDER_DESC } from '../../constants/sort.constants';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { PrismaService } from '@app/prisma/prisma.service';
+import { SORT_ORDER_DESC } from '@app/constants/sort.constants';
+import { CreateUserDto } from '@app/modules/users/dto/create-user.dto';
+import { UpdateUserDto } from '@app/modules/users/dto/update-user.dto';
 
 @Injectable()
 export class UserRepository {

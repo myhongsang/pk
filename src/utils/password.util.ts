@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 
-import { PASSWORD_SALT_ROUNDS } from '../constants/password.constants';
+import { PASSWORD_SALT_ROUNDS } from '@app/constants/password.constants';
 
 export class PasswordUtils {
   static async hash(password: string): Promise<string> {

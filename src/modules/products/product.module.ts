@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { PrismaModule } from '../../prisma/prisma.module';
-import { AuthModule } from '../auth/auth.module';
-import { ProductController } from './product.controller';
-import { ProductRepository } from './product.repository';
-import { ProductService } from './product.service';
+import { PrismaModule } from '@app/prisma/prisma.module';
+import { AuthModule } from '@app/modules/auth/auth.module';
+import { ProductController } from '@app/modules/products/product.controller';
+import { ProductRepository } from '@app/modules/products/product.repository';
+import { ProductService } from '@app/modules/products/product.service';
 
 @Module({
   imports: [PrismaModule, AuthModule],
