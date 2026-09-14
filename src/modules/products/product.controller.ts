@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, UseGuards,} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards,} from '@nestjs/common';
 
 import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth.guard';
 import { ROUTE_PRODUCTS } from '@app/constants/route.constants';
@@ -22,8 +22,8 @@ export class ProductController {
   }
 
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  findAll(@Query('categoryId') categoryId?: string) {
+    return this.productService.findAll(categoryId);
   }
 
   @Get(':id')

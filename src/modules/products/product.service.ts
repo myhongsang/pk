@@ -13,8 +13,8 @@ export class ProductService {
     return this.productRepository.create(data);
   }
 
-  findAll(): Promise<Product[]> {
-    return this.productRepository.findAll();
+  findAll(categoryId?: string): Promise<Product[]> {
+    return this.productRepository.findAll(categoryId);
   }
 
   async findOne(id: string): Promise<Product> {

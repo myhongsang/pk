@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from '@prisma/client';
 
-import { SORT_ORDER_ASC } from '@app/constants/sort.constants';
 import { PrismaService } from '@app/prisma/prisma.service';
 import { CreateProductDto } from '@app/modules/products/dto/create-product.dto';
 import { UpdateProductDto } from '@app/modules/products/dto/update-product.dto';
@@ -14,11 +13,11 @@ export class ProductRepository {
     return this.prisma.product.create({ data });
   }
 
-  findAll(): Promise<Product[]> {
-    return this.prisma.product.findMany({
-      orderBy: { id: SORT_ORDER_ASC },
-    });
-  }
+  findAll(categoryId?: string) {
+  return this.prisma.product.findMany({
+    where: categoryId ? { categoryId } : undefined,
+  });
+}
 
   findById(id: string): Promise<Product | null> {
     return this.prisma.product.findUnique({
