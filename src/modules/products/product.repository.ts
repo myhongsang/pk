@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from '@prisma/client';
 
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { PrismaService } from '@app/prisma/prisma.service';
+import { CreateProductDto } from '@app/modules/products/dto/create-product.dto';
+import { UpdateProductDto } from '@app/modules/products/dto/update-product.dto';
 
 @Injectable()
 export class ProductRepository {
@@ -13,11 +13,11 @@ export class ProductRepository {
     return this.prisma.product.create({ data });
   }
 
-  findAll(): Promise<Product[]> {
-    return this.prisma.product.findMany({
-      orderBy: { id: 'asc' },
-    });
-  }
+  findAll(categoryId?: string) {
+  return this.prisma.product.findMany({
+    where: categoryId ? { categoryId } : undefined,
+  });
+}
 
   findById(id: string): Promise<Product | null> {
     return this.prisma.product.findUnique({
