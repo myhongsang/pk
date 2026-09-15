@@ -3,7 +3,8 @@ import { Prisma, Product } from '@prisma/client';
 
 import { PrismaService } from '@app/prisma/prisma.service';
 import { SORT_ORDER_DESC } from '@app/constants/sort.constants';
-import { createPaginatedResult, type PaginatedResult, type PaginationQueryDto,} from '@app/common/dto/pagination.dto';
+import { createPaginatedResult, type PaginatedResult,} from '@app/common/dto/pagination.dto';
+import type { ProductQueryDto,} from '@app/modules/products/dto/product-query.dto';
 import { CreateProductDto } from '@app/modules/products/dto/create-product.dto';
 import { UpdateProductDto } from '@app/modules/products/dto/update-product.dto';
 
@@ -17,10 +18,10 @@ export class ProductRepository {
 
   async findAll(
     categoryId: string | undefined,
-    { page, limit, q }: PaginationQueryDto,
+    { page, limit, q, minPrice, maxPrice }: ProductQueryDto,
   ): Promise<PaginatedResult<Product>> {
     const where: Prisma.ProductWhereInput | undefined =
-      categoryId || q
+      categoryId || q || minPrice !== undefined || maxPrice !== undefined
         ? {
             ...(categoryId ? { categoryId } : {}),
             ...(q
@@ -29,6 +30,14 @@ export class ProductRepository {
                     { name: { contains: q, mode: 'insensitive' } },
                     { description: { contains: q, mode: 'insensitive' } },
                   ],
+                }
+              : {}),
+            ...(minPrice !== undefined || maxPrice !== undefined
+              ? {
+                  price: {
+                    ...(minPrice !== undefined ? { gte: minPrice } : {}),
+                    ...(maxPrice !== undefined ? { lte: maxPrice } : {}),
+                  },
                 }
               : {}),
           }

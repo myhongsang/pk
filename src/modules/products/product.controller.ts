@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPi
 
 import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth.guard';
 import { ROUTE_PRODUCTS } from '@app/constants/route.constants';
-import { paginationQuerySchema, type PaginationQueryDto,} from '@app/common/dto/pagination.dto';
+import { productQuerySchema, type ProductQueryDto,} from '@app/modules/products/dto/product-query.dto';
 import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
 import { createProductSchema } from '@app/modules/products/dto/create-product.dto';
 import type { CreateProductDto } from '@app/modules/products/dto/create-product.dto';
@@ -25,10 +25,10 @@ export class ProductController {
   @Get()
   findAll(
     @Query('categoryId') categoryId?: string,
-    @Query(new ZodValidationPipe(paginationQuerySchema))
-    pagination?: PaginationQueryDto,
+    @Query(new ZodValidationPipe(productQuerySchema))
+    query?: ProductQueryDto,
   ) {
-    return this.productService.findAll(categoryId, pagination!);
+    return this.productService.findAll(categoryId, query!);
   }
 
   @Get(':id')
