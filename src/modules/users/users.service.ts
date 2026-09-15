@@ -1,10 +1,11 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException,} from '@nestjs/common';
 import { User } from '@prisma/client';
 
-import { PasswordUtils } from '../../utils/password.util';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserRepository } from './user.repository';
+import { PasswordUtils } from '@app/utils/password.util';
+import type { PaginatedResult, PaginationQueryDto,} from '@app/common/dto/pagination.dto';
+import { CreateUserDto } from '@app/modules/users/dto/create-user.dto';
+import { UpdateUserDto } from '@app/modules/users/dto/update-user.dto';
+import { UserRepository } from '@app/modules/users/user.repository';
 
 type SafeUser = Omit<User, 'password'>;
 
@@ -32,10 +33,15 @@ export class UsersService {
     return this.sanitize(user);
   }
 
-  async findAll(): Promise<SafeUser[]> {
-    const users = await this.userRepository.findAll();
+  async findAll(
+    pagination: PaginationQueryDto,
+  ): Promise<PaginatedResult<SafeUser>> {
+    const users = await this.userRepository.findAll(pagination);
 
-    return users.map((user) => this.sanitize(user));
+    return {
+      ...users,
+      data: users.data.map((user) => this.sanitize(user)),
+    };
   }
 
   async findOne(id: string): Promise<SafeUser> {
