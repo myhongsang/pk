@@ -42,6 +42,7 @@ describe('Products API auth flow (e2e)', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(Array.isArray(productsRes.body)).toBe(true);
+    expect(Array.isArray(productsRes.body.data)).toBe(true);
+    expect(productsRes.body.meta).toMatchObject({ page: 1, limit: 25 });
   });
 });

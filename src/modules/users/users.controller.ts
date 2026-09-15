@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post,} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query,} from '@nestjs/common';
 
 import { ROUTE_USERS } from '@app/constants/route.constants';
+import { paginationQuerySchema, type PaginationQueryDto,} from '@app/common/dto/pagination.dto';
 import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
 import { createUserSchema } from '@app/modules/users/dto/create-user.dto';
 import type { CreateUserDto } from '@app/modules/users/dto/create-user.dto';
@@ -18,8 +19,11 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(
+    @Query(new ZodValidationPipe(paginationQuerySchema))
+    pagination: PaginationQueryDto,
+  ) {
+    return this.usersService.findAll(pagination);
   }
 
   @Get(':id')

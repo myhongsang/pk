@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
 import { Category } from '@prisma/client';
 
+import type { PaginatedResult, PaginationQueryDto,} from '@app/common/dto/pagination.dto';
 import { CreateCategoryDto } from '@app/modules/categories/dto/create-category.dto';
 import { UpdateCategoryDto } from '@app/modules/categories/dto/update-category.dto';
 import { CategoriesRepository } from '@app/modules/categories/categories.repository';
@@ -13,8 +14,10 @@ export class CategoriesService {
     return this.categoriesRepository.create(data);
   }
 
-  findAll(): Promise<Category[]> {
-    return this.categoriesRepository.findAll();
+  findAll(
+    pagination: PaginationQueryDto,
+  ): Promise<PaginatedResult<Category>> {
+    return this.categoriesRepository.findAll(pagination);
   }
 
   async findOne(id: string): Promise<Category> {

@@ -3,6 +3,7 @@ import { Category } from '@prisma/client';
 
 import { SORT_ORDER_ASC } from '@app/constants/sort.constants';
 import { PrismaService } from '@app/prisma/prisma.service';
+import { createPaginatedResult, type PaginatedResult, type PaginationQueryDto,} from '@app/common/dto/pagination.dto';
 import { CreateCategoryDto } from '@app/modules/categories/dto/create-category.dto';
 import { UpdateCategoryDto } from '@app/modules/categories/dto/update-category.dto';
 
@@ -14,10 +15,20 @@ export class CategoriesRepository {
     return this.prisma.category.create({ data });
   }
 
-  findAll(): Promise<Category[]> {
-    return this.prisma.category.findMany({
-      orderBy: { id: SORT_ORDER_ASC },
-    });
+  async findAll({
+    page,
+    limit,
+  }: PaginationQueryDto): Promise<PaginatedResult<Category>> {
+    const [categories, total] = await this.prisma.$transaction([
+      this.prisma.category.findMany({
+        orderBy: { id: SORT_ORDER_ASC },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.category.count(),
+    ]);
+
+    return createPaginatedResult(categories, total, { page, limit });
   }
 
   findById(id: string): Promise<Category | null> {

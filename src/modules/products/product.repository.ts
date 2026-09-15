@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Product } from '@prisma/client';
 
 import { PrismaService } from '@app/prisma/prisma.service';
+import { SORT_ORDER_DESC } from '@app/constants/sort.constants';
+import { createPaginatedResult, type PaginatedResult, type PaginationQueryDto,} from '@app/common/dto/pagination.dto';
 import { CreateProductDto } from '@app/modules/products/dto/create-product.dto';
 import { UpdateProductDto } from '@app/modules/products/dto/update-product.dto';
 
@@ -13,11 +15,24 @@ export class ProductRepository {
     return this.prisma.product.create({ data });
   }
 
-  findAll(categoryId?: string) {
-  return this.prisma.product.findMany({
-    where: categoryId ? { categoryId } : undefined,
-  });
-}
+  async findAll(
+    categoryId: string | undefined,
+    { page, limit }: PaginationQueryDto,
+  ): Promise<PaginatedResult<Product>> {
+    const where = categoryId ? { categoryId } : undefined;
+
+    const [products, total] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        where,
+        orderBy: { createdAt: SORT_ORDER_DESC },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return createPaginatedResult(products, total, { page, limit });
+  }
 
   findById(id: string): Promise<Product | null> {
     return this.prisma.product.findUnique({

@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, UseGuards,} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards,} from '@nestjs/common';
 
 import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth.guard';
 import { ROUTE_CATEGORIES } from '@app/constants/route.constants';
+import { paginationQuerySchema, type PaginationQueryDto,} from '@app/common/dto/pagination.dto';
 import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
 import { createCategorySchema } from '@app/modules/categories/dto/create-category.dto';
 import type { CreateCategoryDto } from '@app/modules/categories/dto/create-category.dto';
@@ -22,8 +23,11 @@ export class CategoriesController {
   }
 
   @Get()
-  findAll() {
-    return this.categoriesService.findAll();
+  findAll(
+    @Query(new ZodValidationPipe(paginationQuerySchema))
+    pagination: PaginationQueryDto,
+  ) {
+    return this.categoriesService.findAll(pagination);
   }
 
   @Get(':id')
