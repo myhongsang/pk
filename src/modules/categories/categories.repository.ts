@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Category } from '@prisma/client';
+import { Category, Prisma } from '@prisma/client';
 
 import { SORT_ORDER_ASC } from '@app/constants/sort.constants';
 import { PrismaService } from '@app/prisma/prisma.service';
@@ -18,14 +18,25 @@ export class CategoriesRepository {
   async findAll({
     page,
     limit,
+    q,
   }: PaginationQueryDto): Promise<PaginatedResult<Category>> {
+    const where: Prisma.CategoryWhereInput | undefined = q
+      ? {
+          OR: [
+            { name: { contains: q, mode: 'insensitive' } },
+            { description: { contains: q, mode: 'insensitive' } },
+          ],
+        }
+      : undefined;
+
     const [categories, total] = await this.prisma.$transaction([
       this.prisma.category.findMany({
+        where,
         orderBy: { id: SORT_ORDER_ASC },
         skip: (page - 1) * limit,
         take: limit,
       }),
-      this.prisma.category.count(),
+      this.prisma.category.count({ where }),
     ]);
 
     return createPaginatedResult(categories, total, { page, limit });

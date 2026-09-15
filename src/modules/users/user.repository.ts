@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 import { PrismaService } from '@app/prisma/prisma.service';
 import { SORT_ORDER_DESC } from '@app/constants/sort.constants';
@@ -26,14 +26,25 @@ export class UserRepository {
   async findAll({
     page,
     limit,
+    q,
   }: PaginationQueryDto): Promise<PaginatedResult<User>> {
+    const where: Prisma.UserWhereInput | undefined = q
+      ? {
+          OR: [
+            { name: { contains: q, mode: 'insensitive' } },
+            { email: { contains: q, mode: 'insensitive' } },
+          ],
+        }
+      : undefined;
+
     const [users, total] = await this.prisma.$transaction([
       this.prisma.user.findMany({
+        where,
         orderBy: { createdAt: SORT_ORDER_DESC },
         skip: (page - 1) * limit,
         take: limit,
       }),
-      this.prisma.user.count(),
+      this.prisma.user.count({ where }),
     ]);
 
     return createPaginatedResult(users, total, { page, limit });

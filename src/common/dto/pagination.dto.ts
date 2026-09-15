@@ -1,6 +1,11 @@
 import { z } from 'zod';
 
-import { PAGINATION_DEFAULT_LIMIT, PAGINATION_DEFAULT_PAGE, PAGINATION_MAX_LIMIT,} from '@app/constants/pagination.constants';
+import {
+  PAGINATION_DEFAULT_LIMIT,
+  PAGINATION_DEFAULT_PAGE,
+  PAGINATION_MAX_LIMIT,
+  PAGINATION_MAX_QUERY_LENGTH,
+} from '@app/constants/pagination.constants';
 
 export const paginationQuerySchema = z.object({
   page: z.coerce
@@ -18,6 +23,15 @@ export const paginationQuerySchema = z.object({
       `Limit must be less than or equal to ${PAGINATION_MAX_LIMIT}`,
     )
     .default(PAGINATION_DEFAULT_LIMIT),
+
+  q: z
+    .string()
+    .trim()
+    .max(
+      PAGINATION_MAX_QUERY_LENGTH,
+      `Search term must be less than or equal to ${PAGINATION_MAX_QUERY_LENGTH} characters`,
+    )
+    .optional(),
 });
 
 export type PaginationQueryDto = z.infer<typeof paginationQuerySchema>;

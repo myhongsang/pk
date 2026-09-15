@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Product } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 
 import { PrismaService } from '@app/prisma/prisma.service';
 import { SORT_ORDER_DESC } from '@app/constants/sort.constants';
@@ -17,9 +17,22 @@ export class ProductRepository {
 
   async findAll(
     categoryId: string | undefined,
-    { page, limit }: PaginationQueryDto,
+    { page, limit, q }: PaginationQueryDto,
   ): Promise<PaginatedResult<Product>> {
-    const where = categoryId ? { categoryId } : undefined;
+    const where: Prisma.ProductWhereInput | undefined =
+      categoryId || q
+        ? {
+            ...(categoryId ? { categoryId } : {}),
+            ...(q
+              ? {
+                  OR: [
+                    { name: { contains: q, mode: 'insensitive' } },
+                    { description: { contains: q, mode: 'insensitive' } },
+                  ],
+                }
+              : {}),
+          }
+        : undefined;
 
     const [products, total] = await this.prisma.$transaction([
       this.prisma.product.findMany({
