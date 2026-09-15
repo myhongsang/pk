@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 
-import { JWT_EXPIRES_IN, JWT_PRIVATE_KEY } from '../../constants/jwt.constants';
-import { PasswordUtils } from '../../utils/password.util';
-import { UserRepository } from '../users/user.repository';
+import { JWT_ALGORITHM, JWT_EXPIRES_IN, JWT_PRIVATE_KEY,} from '@app/constants/jwt.constants';
+import { PasswordUtils } from '@app/utils/password.util';
+import { UserRepository } from '@app/modules/users/user.repository';
 
 @Injectable()
 export class AuthService {
@@ -13,10 +13,7 @@ export class AuthService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<User | null> {
+  async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
@@ -44,7 +41,7 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload, {
       privateKey: JWT_PRIVATE_KEY,
-      algorithm: 'RS256',
+      algorithm: JWT_ALGORITHM,
       expiresIn: JWT_EXPIRES_IN,
     });
 

@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Product } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { PrismaService } from '@app/prisma/prisma.service';
+import { SORT_ORDER_DESC } from '@app/constants/sort.constants';
+import { createPaginatedResult, type PaginatedResult, type PaginationQueryDto,} from '@app/common/dto/pagination.dto';
+import { CreateProductDto } from '@app/modules/products/dto/create-product.dto';
+import { UpdateProductDto } from '@app/modules/products/dto/update-product.dto';
 
 @Injectable()
 export class ProductRepository {
@@ -13,10 +15,36 @@ export class ProductRepository {
     return this.prisma.product.create({ data });
   }
 
-  findAll(): Promise<Product[]> {
-    return this.prisma.product.findMany({
-      orderBy: { id: 'asc' },
-    });
+  async findAll(
+    categoryId: string | undefined,
+    { page, limit, q }: PaginationQueryDto,
+  ): Promise<PaginatedResult<Product>> {
+    const where: Prisma.ProductWhereInput | undefined =
+      categoryId || q
+        ? {
+            ...(categoryId ? { categoryId } : {}),
+            ...(q
+              ? {
+                  OR: [
+                    { name: { contains: q, mode: 'insensitive' } },
+                    { description: { contains: q, mode: 'insensitive' } },
+                  ],
+                }
+              : {}),
+          }
+        : undefined;
+
+    const [products, total] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        where,
+        orderBy: { createdAt: SORT_ORDER_DESC },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return createPaginatedResult(products, total, { page, limit });
   }
 
   findById(id: string): Promise<Product | null> {
