@@ -15,6 +15,8 @@ model User {
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @default(now()) @db.Timestamp(6)
 
+  orders Order[]
+
   @@map("users")
 }
 
@@ -29,6 +31,8 @@ model Product {
   updatedAt   DateTime  @updatedAt
   category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
+  orderItems OrderItem[]
+
   @@map("products")
 }
 
@@ -41,4 +45,63 @@ model Category {
   products    Product[]
 
   @@map("categories")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Order {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  status    OrderStatus   @default(PENDING)
+  total     Float         @default(0)
+  items     OrderItem[]
+  payments  Payment[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([userId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  productName String
+  quantity    Int
+  unitPrice   Float
+  createdAt   DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model Payment {
+  id        String        @id @default(uuid())
+  orderId   String
+  order     Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount    Float         @default(0)
+  status    PaymentStatus @default(PENDING)
+  paidAt    DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([orderId])
+  @@map("payments")
 }
