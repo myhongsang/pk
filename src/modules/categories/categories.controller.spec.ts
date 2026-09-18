@@ -1,0 +1,24 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { CategoriesRepository } from '@app/modules/categories/categories.repository';
+import { CategoriesController } from '@app/modules/categories/categories.controller';
+import { CategoriesService } from '@app/modules/categories/categories.service';
+
+describe('CategoriesController', () => {
+  let controller: CategoriesController;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [CategoriesController],
+      providers: [
+        CategoriesService,
+        { provide: CategoriesRepository, useValue: {} },
+      ],
+    }).compile();
+
+    controller = module.get<CategoriesController>(CategoriesController);
+  });
+
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
+});
