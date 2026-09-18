@@ -1,24 +1,7 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards,} from '@nestjs/common';
 
 import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth.guard';
-import {
-  ROUTE_ORDERS,
-  ROUTE_ORDERS_PAYMENTS,
-  ROUTE_ORDERS_STATISTICS,
-} from '@app/constants/route.constants';
+import { ROUTE_ORDERS, ROUTE_ORDERS_PAYMENTS, ROUTE_ORDERS_STATISTICS,} from '@app/constants/route.constants';
 import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
 import { createOrderSchema } from '@app/modules/orders/dto/create-order.dto';
 import type { CreateOrderDto } from '@app/modules/orders/dto/create-order.dto';
