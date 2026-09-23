@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
 import { Product } from '@prisma/client';
 
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { ProductRepository } from './product.repository';
+import type { PaginatedResult,} from '@app/common/dto/pagination.dto';
+import type { ProductQueryDto,} from '@app/modules/products/dto/product-query.dto';
+import { CreateProductDto } from '@app/modules/products/dto/create-product.dto';
+import { UpdateProductDto } from '@app/modules/products/dto/update-product.dto';
+import { ProductRepository } from '@app/modules/products/product.repository';
 
 @Injectable()
 export class ProductService {
@@ -13,8 +15,11 @@ export class ProductService {
     return this.productRepository.create(data);
   }
 
-  findAll(): Promise<Product[]> {
-    return this.productRepository.findAll();
+  findAll(
+    categoryId: string | undefined,
+    query: ProductQueryDto,
+  ): Promise<PaginatedResult<Product>> {
+    return this.productRepository.findAll(categoryId, query);
   }
 
   async findOne(id: string): Promise<Product> {
