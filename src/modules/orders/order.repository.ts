@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Order, Payment, Prisma, Product } from '@prisma/client';
 
 import { SORT_ORDER_DESC } from '@app/constants/sort.constants';
+import { STATUS_ACTIVE } from '@app/constants/status.constants';
 import { PrismaService } from '@app/prisma/prisma.service';
 import {
   createPaginatedResult,
@@ -26,7 +27,14 @@ export class OrderRepository {
 
   findProductsByIds(ids: string[]): Promise<Product[]> {
     return this.prisma.product.findMany({
-      where: { id: { in: ids } },
+      where: { id: { in: ids }, status: STATUS_ACTIVE },
+    });
+  }
+
+  findActiveUserById(id: string): Promise<{ id: string } | null> {
+    return this.prisma.user.findFirst({
+      where: { id, status: STATUS_ACTIVE },
+      select: { id: true },
     });
   }
 

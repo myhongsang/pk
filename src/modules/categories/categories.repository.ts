@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Category, Prisma } from '@prisma/client';
 
 import { SORT_ORDER_ASC } from '@app/constants/sort.constants';
+import {
+  STATUS_ACTIVE,
+  STATUS_INACTIVE,
+} from '@app/constants/status.constants';
 import { PrismaService } from '@app/prisma/prisma.service';
 import { createPaginatedResult, type PaginatedResult, type PaginationQueryDto,} from '@app/common/dto/pagination.dto';
 import { CreateCategoryDto } from '@app/modules/categories/dto/create-category.dto';
@@ -20,14 +24,17 @@ export class CategoriesRepository {
     limit,
     q,
   }: PaginationQueryDto): Promise<PaginatedResult<Category>> {
-    const where: Prisma.CategoryWhereInput | undefined = q
-      ? {
-          OR: [
-            { name: { contains: q, mode: 'insensitive' } },
-            { description: { contains: q, mode: 'insensitive' } },
-          ],
-        }
-      : undefined;
+    const where: Prisma.CategoryWhereInput = {
+      status: STATUS_ACTIVE,
+      ...(q
+        ? {
+            OR: [
+              { name: { contains: q, mode: 'insensitive' } },
+              { description: { contains: q, mode: 'insensitive' } },
+            ],
+          }
+        : {}),
+    };
 
     const [categories, total] = await this.prisma.$transaction([
       this.prisma.category.findMany({
@@ -55,7 +62,10 @@ export class CategoriesRepository {
     });
   }
 
-  async delete(id: string): Promise<void> {
-    await this.prisma.category.delete({ where: { id } });
+  softDelete(id: string): Promise<Category> {
+    return this.prisma.category.update({
+      where: { id },
+      data: { status: STATUS_INACTIVE },
+    });
   }
 }

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { STATUS_VALUES } from '@app/constants/status.constants';
+
 export const updateProductSchema = z.object({
   name: z.string().min(1, 'Name is required').optional(),
 
@@ -17,6 +19,8 @@ export const updateProductSchema = z.object({
     .optional(),
 
   categoryId: z.uuid('categoryId must be a valid UUID').optional(),
+
+  status: z.enum(STATUS_VALUES).optional(),
 });
 
 export type UpdateProductDto = z.infer<typeof updateProductSchema>;

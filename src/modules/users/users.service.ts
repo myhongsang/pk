@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException,}
 import { User } from '@prisma/client';
 
 import { PasswordUtils } from '@app/utils/password.util';
+import { STATUS_ACTIVE } from '@app/constants/status.constants';
 import type { PaginatedResult, PaginationQueryDto,} from '@app/common/dto/pagination.dto';
 import { CreateUserDto } from '@app/modules/users/dto/create-user.dto';
 import { UpdateUserDto } from '@app/modules/users/dto/update-user.dto';
@@ -47,7 +48,7 @@ export class UsersService {
   async findOne(id: string): Promise<SafeUser> {
     const user = await this.userRepository.findById(id);
 
-    if (!user) {
+    if (!user || user.status !== STATUS_ACTIVE) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
@@ -55,7 +56,11 @@ export class UsersService {
   }
 
   async update(id: string, data: UpdateUserDto): Promise<SafeUser> {
-    await this.findOne(id);
+    const existingUser = await this.userRepository.findById(id);
+
+    if (!existingUser) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
 
     if (Object.keys(data).length === 0) {
       throw new BadRequestException('No fields to update');
@@ -84,7 +89,7 @@ export class UsersService {
 
   async remove(id: string): Promise<void> {
     await this.findOne(id);
-    await this.userRepository.delete(id);
+    await this.userRepository.softDelete(id);
   }
 
   private sanitize(user: User): SafeUser {

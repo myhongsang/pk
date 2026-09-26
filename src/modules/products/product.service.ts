@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException,} from '@nestjs/comm
 import { Product } from '@prisma/client';
 
 import type { PaginatedResult,} from '@app/common/dto/pagination.dto';
+import { STATUS_ACTIVE } from '@app/constants/status.constants';
 import type { ProductQueryDto,} from '@app/modules/products/dto/product-query.dto';
 import { CreateProductDto } from '@app/modules/products/dto/create-product.dto';
 import { UpdateProductDto } from '@app/modules/products/dto/update-product.dto';
@@ -25,7 +26,7 @@ export class ProductService {
   async findOne(id: string): Promise<Product> {
     const product = await this.productRepository.findById(id);
 
-    if (!product) {
+    if (!product || product.status !== STATUS_ACTIVE) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
 
@@ -33,7 +34,11 @@ export class ProductService {
   }
 
   async update(id: string, data: UpdateProductDto): Promise<Product> {
-    await this.findOne(id);
+    const existingProduct = await this.productRepository.findById(id);
+
+    if (!existingProduct) {
+      throw new NotFoundException(`Product with id ${id} not found`);
+    }
 
     if (Object.keys(data).length === 0) {
       throw new BadRequestException('No fields to update');
@@ -44,6 +49,6 @@ export class ProductService {
 
   async remove(id: string): Promise<void> {
     await this.findOne(id);
-    await this.productRepository.delete(id);
+    await this.productRepository.softDelete(id);
   }
 }
