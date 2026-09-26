@@ -13,6 +13,7 @@ describe('UsersService', () => {
     name: 'Alice',
     email: 'alice@example.com',
     password: 'hashed-password',
+    status: 'ACTIVE',
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -29,7 +30,7 @@ describe('UsersService', () => {
             findAll: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
-            delete: jest.fn(),
+            softDelete: jest.fn(),
           },
         },
       ],
@@ -112,6 +113,17 @@ describe('UsersService', () => {
       expect(result.email).toBe('alice@example.com');
       expect(result).not.toHaveProperty('password');
     });
+
+    it('should throw NotFoundException when the user is inactive', async () => {
+      (repository.findById as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        status: 'INACTIVE',
+      });
+
+      await expect(service.findOne('uuid-1')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
   });
 
   describe('update', () => {
@@ -155,13 +167,27 @@ describe('UsersService', () => {
       await expect(service.remove('uuid-1')).rejects.toThrow(NotFoundException);
     });
 
-    it('should delete the user when it exists', async () => {
+    it('should soft delete the user when it exists', async () => {
       (repository.findById as jest.Mock).mockResolvedValue(mockUser);
-      (repository.delete as jest.Mock).mockResolvedValue(undefined);
+      (repository.softDelete as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        status: 'INACTIVE',
+      });
 
       await service.remove('uuid-1');
 
-      expect(repository.delete).toHaveBeenCalledWith('uuid-1');
+      expect(repository.softDelete).toHaveBeenCalledWith('uuid-1');
+    });
+
+    it('should throw NotFoundException when the user is already inactive', async () => {
+      (repository.findById as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        status: 'INACTIVE',
+      });
+
+      await expect(service.remove('uuid-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

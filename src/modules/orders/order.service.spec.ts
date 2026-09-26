@@ -38,6 +38,7 @@ describe('OrderService', () => {
         {
           provide: OrderRepository,
           useValue: {
+            findActiveUserById: jest.fn(),
             findProductsByIds: jest.fn(),
             findById: jest.fn(),
             findAll: jest.fn(),
@@ -71,7 +72,21 @@ describe('OrderService', () => {
   });
 
   describe('create', () => {
+    it('should throw NotFoundException when the user is not active', async () => {
+      (repository.findActiveUserById as jest.Mock).mockResolvedValue(null);
+
+      await expect(
+        service.create({
+          userId: 'missing-user',
+          items: [{ productId: 'product-1', quantity: 1 }],
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
     it('should throw NotFoundException when a product does not exist', async () => {
+      (repository.findActiveUserById as jest.Mock).mockResolvedValue({
+        id: 'user-1',
+      });
       (repository.findProductsByIds as jest.Mock).mockResolvedValue([]);
 
       await expect(
@@ -83,6 +98,9 @@ describe('OrderService', () => {
     });
 
     it('should compute the total and persist enriched items', async () => {
+      (repository.findActiveUserById as jest.Mock).mockResolvedValue({
+        id: 'user-1',
+      });
       (repository.findProductsByIds as jest.Mock).mockResolvedValue([
         mockProduct,
         { ...mockProduct, id: 'product-2', name: 'Latte', price: 35_000 },

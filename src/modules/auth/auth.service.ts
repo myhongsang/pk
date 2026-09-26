@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 
 import { JWT_ALGORITHM, JWT_EXPIRES_IN, JWT_PRIVATE_KEY,} from '@app/constants/jwt.constants';
+import { STATUS_ACTIVE } from '@app/constants/status.constants';
 import { PasswordUtils } from '@app/utils/password.util';
 import { UserRepository } from '@app/modules/users/user.repository';
 
@@ -17,6 +18,10 @@ export class AuthService {
     const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
+      return null;
+    }
+
+    if (user.status !== STATUS_ACTIVE) {
       return null;
     }
 

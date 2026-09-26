@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException,} from '@nestjs/comm
 import { Category } from '@prisma/client';
 
 import type { PaginatedResult, PaginationQueryDto,} from '@app/common/dto/pagination.dto';
+import { STATUS_ACTIVE } from '@app/constants/status.constants';
 import { CreateCategoryDto } from '@app/modules/categories/dto/create-category.dto';
 import { UpdateCategoryDto } from '@app/modules/categories/dto/update-category.dto';
 import { CategoriesRepository } from '@app/modules/categories/categories.repository';
@@ -23,7 +24,7 @@ export class CategoriesService {
   async findOne(id: string): Promise<Category> {
     const category = await this.categoriesRepository.findById(id);
 
-    if (!category) {
+    if (!category || category.status !== STATUS_ACTIVE) {
       throw new NotFoundException(`Category with id ${id} not found`);
     }
 
@@ -31,7 +32,11 @@ export class CategoriesService {
   }
 
   async update(id: string, data: UpdateCategoryDto): Promise<Category> {
-    await this.findOne(id);
+    const existingCategory = await this.categoriesRepository.findById(id);
+
+    if (!existingCategory) {
+      throw new NotFoundException(`Category with id ${id} not found`);
+    }
 
     if (Object.keys(data).length === 0) {
       throw new BadRequestException('No fields to update');
@@ -42,6 +47,6 @@ export class CategoriesService {
 
   async remove(id: string): Promise<void> {
     await this.findOne(id);
-    await this.categoriesRepository.delete(id);
+    await this.categoriesRepository.softDelete(id);
   }
 }

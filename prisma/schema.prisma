@@ -12,11 +12,13 @@ model User {
   email     String   @unique(map: "UQ_97672ac88f789774dd47f7c8be3") @db.VarChar
   password  String   @db.VarChar
   name      String   @db.VarChar
+  status    String   @default("ACTIVE")
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @default(now()) @db.Timestamp(6)
 
   orders Order[]
 
+  @@index([status])
   @@map("users")
 }
 
@@ -27,12 +29,14 @@ model Product {
   price       Float     @default(0)
   stock       Int       @default(0)
   categoryId  String?
+  status      String    @default("ACTIVE")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   orderItems OrderItem[]
 
+  @@index([status])
   @@map("products")
 }
 
@@ -40,10 +44,12 @@ model Category {
   id          String    @id @default(uuid())
   name        String
   description String?
+  status      String    @default("ACTIVE")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   products    Product[]
 
+  @@index([status])
   @@map("categories")
 }
 

@@ -22,6 +22,12 @@ export class OrderService {
   constructor(private readonly orderRepository: OrderRepository) {}
 
   async create(data: CreateOrderDto): Promise<Order> {
+    const user = await this.orderRepository.findActiveUserById(data.userId);
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${data.userId} not found`);
+    }
+
     const uniqueProductIds = [
       ...new Set(data.items.map((item) => item.productId)),
     ];
