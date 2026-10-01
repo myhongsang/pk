@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards,} from '@nestjs/common';
 
 import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth.guard';
-import { ROUTE_ORDERS, ROUTE_ORDERS_PAYMENTS, ROUTE_ORDERS_STATISTICS,} from '@app/constants/route.constants';
 import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
 import { createOrderSchema } from '@app/modules/orders/dto/create-order.dto';
 import type { CreateOrderDto } from '@app/modules/orders/dto/create-order.dto';
@@ -15,7 +14,7 @@ import { updateOrderSchema } from '@app/modules/orders/dto/update-order.dto';
 import type { UpdateOrderDto } from '@app/modules/orders/dto/update-order.dto';
 import { OrderService } from '@app/modules/orders/order.service';
 
-@Controller(ROUTE_ORDERS)
+@Controller('orders')
 @UseGuards(JwtAuthGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -25,7 +24,7 @@ export class OrderController {
     return this.orderService.create(dto);
   }
 
-  @Get(ROUTE_ORDERS_STATISTICS)
+  @Get('statistics')
   getStatistics(
     @Query(new ZodValidationPipe(statisticsQuerySchema))
     query: StatisticsQueryDto,
@@ -45,7 +44,7 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @Post(`:id/${ROUTE_ORDERS_PAYMENTS}`)
+  @Post(':id/payments')
   addPayment(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodValidationPipe(createPaymentSchema)) dto: CreatePaymentDto,

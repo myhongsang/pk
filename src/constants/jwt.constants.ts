@@ -31,5 +31,3 @@ export const JWT_PUBLIC_KEY = fs.readFileSync(publicKeyPath, 'utf8');
 export const JWT_EXPIRES_IN = '1h';
 
 export const JWT_ALGORITHM = 'RS256';
-
-export const JWT_IGNORE_EXPIRATION = false;

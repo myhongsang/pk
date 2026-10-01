@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query,} from '@nestjs/common';
 
-import { ROUTE_USERS } from '@app/constants/route.constants';
 import { paginationQuerySchema, type PaginationQueryDto,} from '@app/common/dto/pagination.dto';
 import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
 import { createUserSchema } from '@app/modules/users/dto/create-user.dto';
@@ -9,7 +8,7 @@ import { updateUserSchema } from '@app/modules/users/dto/update-user.dto';
 import type { UpdateUserDto } from '@app/modules/users/dto/update-user.dto';
 import { UsersService } from '@app/modules/users/users.service';
 
-@Controller(ROUTE_USERS)
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

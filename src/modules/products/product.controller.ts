@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards,} from '@nestjs/common';
 
 import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth.guard';
-import { ROUTE_PRODUCTS } from '@app/constants/route.constants';
 import { productQuerySchema, type ProductQueryDto,} from '@app/modules/products/dto/product-query.dto';
 import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
 import { createProductSchema } from '@app/modules/products/dto/create-product.dto';
@@ -10,7 +9,7 @@ import { updateProductSchema } from '@app/modules/products/dto/update-product.dt
 import type { UpdateProductDto } from '@app/modules/products/dto/update-product.dto';
 import { ProductService } from '@app/modules/products/product.service';
 
-@Controller(ROUTE_PRODUCTS)
+@Controller('products')
 @UseGuards(JwtAuthGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}

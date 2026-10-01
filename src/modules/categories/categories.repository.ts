@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Category, Prisma } from '@prisma/client';
 
-import { SORT_ORDER_ASC } from '@app/constants/sort.constants';
 import {
   STATUS_ACTIVE,
   STATUS_INACTIVE,
@@ -39,7 +38,7 @@ export class CategoriesRepository {
     const [categories, total] = await this.prisma.$transaction([
       this.prisma.category.findMany({
         where,
-        orderBy: { id: SORT_ORDER_ASC },
+        orderBy: { id: 'asc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
