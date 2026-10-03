@@ -1,6 +1,7 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { STATUS_ACTIVE, STATUS_INACTIVE } from '@app/constants/status.constants';
 import { UserRepository } from '@app/modules/users/user.repository';
 import { UsersService } from '@app/modules/users/users.service';
 
@@ -13,7 +14,7 @@ describe('UsersService', () => {
     name: 'Alice',
     email: 'alice@example.com',
     password: 'hashed-password',
-    status: 'ACTIVE',
+    status: STATUS_ACTIVE,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -117,7 +118,7 @@ describe('UsersService', () => {
     it('should throw NotFoundException when the user is inactive', async () => {
       (repository.findById as jest.Mock).mockResolvedValue({
         ...mockUser,
-        status: 'INACTIVE',
+        status: STATUS_INACTIVE,
       });
 
       await expect(service.findOne('uuid-1')).rejects.toThrow(
@@ -171,7 +172,7 @@ describe('UsersService', () => {
       (repository.findById as jest.Mock).mockResolvedValue(mockUser);
       (repository.softDelete as jest.Mock).mockResolvedValue({
         ...mockUser,
-        status: 'INACTIVE',
+        status: STATUS_INACTIVE,
       });
 
       await service.remove('uuid-1');
@@ -182,7 +183,7 @@ describe('UsersService', () => {
     it('should throw NotFoundException when the user is already inactive', async () => {
       (repository.findById as jest.Mock).mockResolvedValue({
         ...mockUser,
-        status: 'INACTIVE',
+        status: STATUS_INACTIVE,
       });
 
       await expect(service.remove('uuid-1')).rejects.toThrow(

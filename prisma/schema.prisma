@@ -13,6 +13,7 @@ model User {
   password  String   @db.VarChar
   name      String   @db.VarChar
   status    String   @default("ACTIVE")
+  role      String   @default("EMPLOYEE")
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @default(now()) @db.Timestamp(6)
 
