@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { ROLE_VALUES } from '@app/constants/role.constants';
+
 export const createUserSchema = z.object({
   name: z
     .string()
@@ -11,6 +13,7 @@ export const createUserSchema = z.object({
     .string()
     .min(6, 'Password must be at least 6 characters')
     .max(72, 'Password must be at most 72 characters'),
+  role: z.enum(ROLE_VALUES, 'Invalid role').optional(),
 });
 
 export type CreateUserDto = z.infer<typeof createUserSchema>;

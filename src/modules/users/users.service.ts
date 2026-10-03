@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException,}
 import { User } from '@prisma/client';
 
 import { PasswordUtils } from '@app/utils/password.util';
+import { ROLE_EMPLOYEE } from '@app/constants/role.constants';
 import { STATUS_ACTIVE } from '@app/constants/status.constants';
 import type { PaginatedResult, PaginationQueryDto,} from '@app/common/dto/pagination.dto';
 import { CreateUserDto } from '@app/modules/users/dto/create-user.dto';
@@ -29,6 +30,7 @@ export class UsersService {
       name: data.name,
       email: data.email,
       password: hashedPassword,
+      role: data.role ?? ROLE_EMPLOYEE,
     });
 
     return this.sanitize(user);
