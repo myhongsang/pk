@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Order, Payment, Prisma, Product } from '@prisma/client';
 
+import { PAYMENT_STATUS_PAID } from '@app/constants/order.constants';
 import { SORT_ORDER_DESC } from '@app/constants/sort.constants';
 import { STATUS_ACTIVE } from '@app/constants/status.constants';
 import { PrismaService } from '@app/prisma/prisma.service';
@@ -105,7 +106,7 @@ export class OrderRepository {
         orderId,
         amount,
         status,
-        paidAt: status === 'PAID' ? new Date() : null,
+        paidAt: status === PAYMENT_STATUS_PAID ? new Date() : null,
       },
     });
   }
@@ -148,7 +149,7 @@ export class OrderRepository {
   async sumPaid(where: Prisma.OrderWhereInput): Promise<number> {
     const result = await this.prisma.payment.aggregate({
       where: {
-        status: 'PAID',
+        status: PAYMENT_STATUS_PAID,
         order: where,
       },
       _sum: { amount: true },

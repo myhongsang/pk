@@ -4,7 +4,6 @@ import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@app/modules/auth/guards/roles.guard';
 import { Roles } from '@app/modules/auth/decorators/roles.decorator';
 import { ROLE_ADMIN, ROLE_EMPLOYEE } from '@app/constants/role.constants';
-import { ROUTE_ORDERS, ROUTE_ORDERS_PAYMENTS, ROUTE_ORDERS_STATISTICS,} from '@app/constants/route.constants';
 import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
 import { createOrderSchema } from '@app/modules/orders/dto/create-order.dto';
 import type { CreateOrderDto } from '@app/modules/orders/dto/create-order.dto';
@@ -18,7 +17,7 @@ import { updateOrderSchema } from '@app/modules/orders/dto/update-order.dto';
 import type { UpdateOrderDto } from '@app/modules/orders/dto/update-order.dto';
 import { OrderService } from '@app/modules/orders/order.service';
 
-@Controller(ROUTE_ORDERS)
+@Controller('orders')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -29,7 +28,7 @@ export class OrderController {
     return this.orderService.create(dto);
   }
 
-  @Get(ROUTE_ORDERS_STATISTICS)
+  @Get('statistics')
   @Roles(ROLE_ADMIN, ROLE_EMPLOYEE)
   getStatistics(
     @Query(new ZodValidationPipe(statisticsQuerySchema))
@@ -52,7 +51,7 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @Post(`:id/${ROUTE_ORDERS_PAYMENTS}`)
+  @Post(':id/payments')
   @Roles(ROLE_ADMIN, ROLE_EMPLOYEE)
   addPayment(
     @Param('id', ParseUUIDPipe) id: string,

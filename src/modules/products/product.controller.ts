@@ -4,7 +4,6 @@ import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@app/modules/auth/guards/roles.guard';
 import { Roles } from '@app/modules/auth/decorators/roles.decorator';
 import { ROLE_ADMIN, ROLE_EMPLOYEE } from '@app/constants/role.constants';
-import { ROUTE_PRODUCTS } from '@app/constants/route.constants';
 import { productQuerySchema, type ProductQueryDto,} from '@app/modules/products/dto/product-query.dto';
 import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
 import { createProductSchema } from '@app/modules/products/dto/create-product.dto';
@@ -13,7 +12,7 @@ import { updateProductSchema } from '@app/modules/products/dto/update-product.dt
 import type { UpdateProductDto } from '@app/modules/products/dto/update-product.dto';
 import { ProductService } from '@app/modules/products/product.service';
 
-@Controller(ROUTE_PRODUCTS)
+@Controller('products')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}

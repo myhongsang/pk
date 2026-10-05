@@ -1,5 +1,6 @@
 import {
   PAGINATION_DEFAULT_LIMIT,
+  PAGINATION_DEFAULT_PAGE,
   PAGINATION_MAX_LIMIT,
   PAGINATION_MAX_QUERY_LENGTH,
 } from '@app/constants/pagination.constants';
@@ -8,7 +9,7 @@ import { paginationQuerySchema } from '@app/common/dto/pagination.dto';
 describe('paginationQuerySchema', () => {
   it('applies default page and limit when query is empty', () => {
     expect(paginationQuerySchema.parse({})).toEqual({
-      page: 1,
+      page: PAGINATION_DEFAULT_PAGE,
       limit: PAGINATION_DEFAULT_LIMIT,
     });
   });
@@ -23,7 +24,10 @@ describe('paginationQuerySchema', () => {
   it('strips unknown query params', () => {
     expect(
       paginationQuerySchema.parse({ page: '2', categoryId: 'abc' }),
-    ).toEqual({ page: 2, limit: PAGINATION_DEFAULT_LIMIT });
+    ).toEqual({
+      page: 2,
+      limit: PAGINATION_DEFAULT_LIMIT,
+    });
   });
 
   it('keeps the search term optional', () => {
@@ -36,7 +40,11 @@ describe('paginationQuerySchema', () => {
   it('accepts and trims a search term', () => {
     expect(
       paginationQuerySchema.parse({ page: '1', limit: '10', q: '  alice  ' }),
-    ).toEqual({ page: 1, limit: 10, q: 'alice' });
+    ).toEqual({
+      page: PAGINATION_DEFAULT_PAGE,
+      limit: 10,
+      q: 'alice',
+    });
   });
 
   it('rejects an oversized search term', () => {
@@ -64,7 +72,10 @@ describe('paginationQuerySchema', () => {
   it('accepts a limit equal to the maximum', () => {
     expect(
       paginationQuerySchema.parse({ limit: String(PAGINATION_MAX_LIMIT) }),
-    ).toEqual({ page: 1, limit: PAGINATION_MAX_LIMIT });
+    ).toEqual({
+      page: PAGINATION_DEFAULT_PAGE,
+      limit: PAGINATION_MAX_LIMIT,
+    });
   });
 
   it('rejects a non-numeric limit', () => {

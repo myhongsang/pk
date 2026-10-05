@@ -41,7 +41,9 @@ describe('RolesGuard', () => {
       ROLE_EMPLOYEE,
     ]);
 
-    expect(guard.canActivate(createContext({ role: ROLE_EMPLOYEE }))).toBe(true);
+    expect(
+      guard.canActivate(createContext({ role: ROLE_EMPLOYEE })),
+    ).toBe(true);
   });
 
   it('should throw ForbiddenException when the user role is not allowed', () => {
@@ -55,6 +57,8 @@ describe('RolesGuard', () => {
   it('should throw ForbiddenException when there is no authenticated user', () => {
     (reflector.getAllAndOverride as jest.Mock).mockReturnValue([ROLE_ADMIN]);
 
-    expect(() => guard.canActivate(createContext())).toThrow(ForbiddenException);
+    expect(() => guard.canActivate(createContext())).toThrow(
+      ForbiddenException,
+    );
   });
 });

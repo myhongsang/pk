@@ -4,7 +4,6 @@ import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@app/modules/auth/guards/roles.guard';
 import { Roles } from '@app/modules/auth/decorators/roles.decorator';
 import { ROLE_ADMIN, ROLE_EMPLOYEE } from '@app/constants/role.constants';
-import { ROUTE_CATEGORIES } from '@app/constants/route.constants';
 import { paginationQuerySchema, type PaginationQueryDto,} from '@app/common/dto/pagination.dto';
 import { ZodValidationPipe } from '@app/utils/zod-validation.pipe';
 import { createCategorySchema } from '@app/modules/categories/dto/create-category.dto';
@@ -13,7 +12,7 @@ import { updateCategorySchema } from '@app/modules/categories/dto/update-categor
 import type { UpdateCategoryDto } from '@app/modules/categories/dto/update-category.dto';
 import { CategoriesService } from '@app/modules/categories/categories.service';
 
-@Controller(ROUTE_CATEGORIES)
+@Controller('categories')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}

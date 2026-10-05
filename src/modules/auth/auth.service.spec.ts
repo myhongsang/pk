@@ -2,6 +2,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuthService } from '@app/modules/auth/auth.service';
+import { STATUS_ACTIVE, STATUS_INACTIVE } from '@app/constants/status.constants';
 import { UserRepository } from '@app/modules/users/user.repository';
 
 describe('AuthService', () => {
@@ -31,7 +32,7 @@ describe('AuthService', () => {
       name: 'Alice',
       email: 'alice@example.com',
       password: 'hashed-password',
-      status: 'ACTIVE',
+      status: STATUS_ACTIVE,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -47,7 +48,7 @@ describe('AuthService', () => {
     it('should return null when the user is inactive', async () => {
       (userRepository.findByEmail as jest.Mock).mockResolvedValue({
         ...mockUser,
-        status: 'INACTIVE',
+        status: STATUS_INACTIVE,
       });
 
       await expect(
