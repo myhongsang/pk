@@ -157,4 +157,136 @@ export class OrderRepository {
 
     return result._sum.amount ?? 0;
   }
+
+  async sumRevenueByDay(
+    where: Prisma.OrderWhereInput,
+  ): Promise<{ date: string; revenue: number; orderCount: number }[]> {
+    const conditions: Prisma.Sql[] = [Prisma.sql`TRUE`];
+
+    if (where.status) {
+      conditions.push(Prisma.sql`"status"::text = ${where.status as string}`);
+    }
+
+    const createdAt = where.createdAt as
+      | { gte?: Date; lte?: Date }
+      | undefined;
+
+    if (createdAt?.gte) {
+      conditions.push(Prisma.sql`"createdAt" >= ${createdAt.gte}`);
+    }
+
+    if (createdAt?.lte) {
+      conditions.push(Prisma.sql`"createdAt" <= ${createdAt.lte}`);
+    }
+
+    const filter = Prisma.join(conditions, ' AND ');
+
+    const rows = await this.prisma.$queryRaw<
+      { day: Date; revenue: number; orderCount: bigint }[]
+    >`
+      SELECT DATE_TRUNC('day', "createdAt") AS day,
+             COALESCE(SUM(total), 0) AS revenue,
+             COUNT(*)::bigint AS "orderCount"
+      FROM "orders"
+      WHERE ${filter}
+      GROUP BY 1
+      ORDER BY 1 ASC
+    `;
+
+    return rows.map((row) => ({
+      date: row.day.toISOString().slice(0, 10),
+      revenue: Number(row.revenue),
+      orderCount: Number(row.orderCount),
+    }));
+  }
+
+  async sumRevenueByMonth(
+    where: Prisma.OrderWhereInput,
+  ): Promise<{ month: string; revenue: number; orderCount: number }[]> {
+    const conditions: Prisma.Sql[] = [Prisma.sql`TRUE`];
+
+    if (where.status) {
+      conditions.push(Prisma.sql`"status"::text = ${where.status as string}`);
+    }
+
+    const createdAt = where.createdAt as
+      | { gte?: Date; lte?: Date }
+      | undefined;
+
+    if (createdAt?.gte) {
+      conditions.push(Prisma.sql`"createdAt" >= ${createdAt.gte}`);
+    }
+
+    if (createdAt?.lte) {
+      conditions.push(Prisma.sql`"createdAt" <= ${createdAt.lte}`);
+    }
+
+    const filter = Prisma.join(conditions, ' AND ');
+
+    const rows = await this.prisma.$queryRaw<
+      { month: Date; revenue: number; orderCount: bigint }[]
+    >`
+      SELECT DATE_TRUNC('month', "createdAt") AS month,
+             COALESCE(SUM(total), 0) AS revenue,
+             COUNT(*)::bigint AS "orderCount"
+      FROM "orders"
+      WHERE ${filter}
+      GROUP BY 1
+      ORDER BY 1 ASC
+    `;
+
+    return rows.map((row) => ({
+      month: row.month.toISOString().slice(0, 7),
+      revenue: Number(row.revenue),
+      orderCount: Number(row.orderCount),
+    }));
+  }
+
+  async findTopProducts(
+    where: Prisma.OrderWhereInput,
+    limit: number,
+  ): Promise<
+    {
+      productId: string;
+      productName: string;
+      quantity: number;
+      revenue: number;
+      orderCount: number;
+    }[]
+  > {
+    const items = await this.prisma.orderItem.findMany({
+      where: { order: where },
+      select: { productId: true, productName: true, quantity: true, unitPrice: true, orderId: true },
+    });
+
+    const map = new Map<
+      string,
+      { productName: string; quantity: number; revenue: number; orders: Set<string> }
+    >();
+
+    for (const item of items) {
+      const entry = map.get(item.productId) ?? {
+        productName: item.productName,
+        quantity: 0,
+        revenue: 0,
+        orders: new Set<string>(),
+      };
+      entry.productName = item.productName;
+      entry.quantity += item.quantity;
+      entry.revenue += item.quantity * item.unitPrice;
+      entry.orders.add(item.orderId);
+      map.set(item.productId, entry);
+    }
+
+    return [...map.entries()]
+      .map(([productId, v]) => ({
+        productId,
+        productName: v.productName,
+        quantity: v.quantity,
+        revenue: Math.round(v.revenue * 100) / 100,
+        orderCount: v.orders.size,
+      }))
+      .sort((a, b) => b.quantity - a.quantity || b.revenue - a.revenue)
+      .slice(0, limit);
+  }
 }

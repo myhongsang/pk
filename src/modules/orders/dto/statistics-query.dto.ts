@@ -6,6 +6,7 @@ export const statisticsQuerySchema = z.object({
   from: z.coerce.date('Invalid from date').optional(),
   to: z.coerce.date('Invalid to date').optional(),
   status: z.enum(ORDER_STATUS_VALUES).optional(),
+  topLimit: z.coerce.number().int().min(1).max(50).default(5),
 });
 
 export type StatisticsQueryDto = z.infer<typeof statisticsQuerySchema>;
