@@ -10,11 +10,34 @@ import { StatisticsQueryDto } from '@app/modules/orders/dto/statistics-query.dto
 import { UpdateOrderDto } from '@app/modules/orders/dto/update-order.dto';
 import { OrderRepository } from '@app/modules/orders/order.repository';
 
+export interface RevenueByDay {
+  date: string;
+  revenue: number;
+  orderCount: number;
+}
+
+export interface RevenueByMonth {
+  month: string;
+  revenue: number;
+  orderCount: number;
+}
+
+export interface TopProduct {
+  productId: string;
+  productName: string;
+  quantity: number;
+  revenue: number;
+  orderCount: number;
+}
+
 export interface OrderStatistics {
   orderCount: number;
   orderValue: number;
   totalPaid: number;
   totalUnpaid: number;
+  revenueByDay: RevenueByDay[];
+  revenueByMonth: RevenueByMonth[];
+  topProducts: TopProduct[];
 }
 
 @Injectable()
@@ -113,17 +136,24 @@ export class OrderService {
   async getStatistics(query: StatisticsQueryDto): Promise<OrderStatistics> {
     const where = this.orderRepository.buildWhere(query);
 
-    const [orderCount, orderValue, totalPaid] = await Promise.all([
-      this.orderRepository.countOrders(where),
-      this.orderRepository.sumOrderTotal(where),
-      this.orderRepository.sumPaid(where),
-    ]);
+    const [orderCount, orderValue, totalPaid, revenueByDay, revenueByMonth, topProducts] =
+      await Promise.all([
+        this.orderRepository.countOrders(where),
+        this.orderRepository.sumOrderTotal(where),
+        this.orderRepository.sumPaid(where),
+        this.orderRepository.sumRevenueByDay(where),
+        this.orderRepository.sumRevenueByMonth(where),
+        this.orderRepository.findTopProducts(where, query.topLimit ?? 5),
+      ]);
 
     return {
       orderCount,
       orderValue,
       totalPaid,
       totalUnpaid: Math.round((orderValue - totalPaid) * 100) / 100,
+      revenueByDay,
+      revenueByMonth,
+      topProducts,
     };
   }
 }

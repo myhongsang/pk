@@ -50,6 +50,9 @@ describe('OrderService', () => {
             countOrders: jest.fn(),
             sumOrderTotal: jest.fn(),
             sumPaid: jest.fn(),
+            sumRevenueByDay: jest.fn(),
+            sumRevenueByMonth: jest.fn(),
+            findTopProducts: jest.fn(),
           },
         },
       ],
@@ -266,29 +269,62 @@ describe('OrderService', () => {
       (repository.countOrders as jest.Mock).mockResolvedValue(3);
       (repository.sumOrderTotal as jest.Mock).mockResolvedValue(200_000);
       (repository.sumPaid as jest.Mock).mockResolvedValue(120_000);
+      (repository.sumRevenueByDay as jest.Mock).mockResolvedValue([
+        { date: '2026-10-01', revenue: 200_000, orderCount: 3 },
+      ]);
+      (repository.sumRevenueByMonth as jest.Mock).mockResolvedValue([
+        { month: '2026-10', revenue: 200_000, orderCount: 3 },
+      ]);
+      (repository.findTopProducts as jest.Mock).mockResolvedValue([
+        {
+          productId: 'product-1',
+          productName: 'Espresso',
+          quantity: 5,
+          revenue: 100_000,
+          orderCount: 2,
+        },
+      ]);
 
-      const result = await service.getStatistics({});
+      const result = await service.getStatistics({ topLimit: 5 });
 
       expect(result).toEqual({
         orderCount: 3,
         orderValue: 200_000,
         totalPaid: 120_000,
         totalUnpaid: 80_000,
+        revenueByDay: [{ date: '2026-10-01', revenue: 200_000, orderCount: 3 }],
+        revenueByMonth: [{ month: '2026-10', revenue: 200_000, orderCount: 3 }],
+        topProducts: [
+          {
+            productId: 'product-1',
+            productName: 'Espresso',
+            quantity: 5,
+            revenue: 100_000,
+            orderCount: 2,
+          },
+        ],
       });
+      expect(repositoryMock.findTopProducts).toHaveBeenCalledWith({}, 5);
     });
 
     it('should default to zero when there is no data', async () => {
       (repository.countOrders as jest.Mock).mockResolvedValue(0);
       (repository.sumOrderTotal as jest.Mock).mockResolvedValue(0);
       (repository.sumPaid as jest.Mock).mockResolvedValue(0);
+      (repository.sumRevenueByDay as jest.Mock).mockResolvedValue([]);
+      (repository.sumRevenueByMonth as jest.Mock).mockResolvedValue([]);
+      (repository.findTopProducts as jest.Mock).mockResolvedValue([]);
 
-      const result = await service.getStatistics({});
+      const result = await service.getStatistics({ topLimit: 5 });
 
       expect(result).toEqual({
         orderCount: 0,
         orderValue: 0,
         totalPaid: 0,
         totalUnpaid: 0,
+        revenueByDay: [],
+        revenueByMonth: [],
+        topProducts: [],
       });
     });
   });
